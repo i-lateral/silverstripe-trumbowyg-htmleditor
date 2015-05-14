@@ -1,0 +1,23 @@
+{
+  "name": "i-lateral/silverstripe-trumbowyg-htmleditor",
+  "description": "Simple HTML Editor field for the Silverstripe CMS that uses the Trumbowyg jquery plugin for WYSIWYG editing",
+    "type": "silverstripe-module",
+    "homepage": "http://github.com/i-lateral/silverstripe-trumbowyg-htmleditor",
+    "keywords": ["silverstripe", "fields", "form", "html", "editor", "WYSIWYG"],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Morven Lewis-Everley",
+            "email": "morven@i-lateral.com"
+        }
+    ],
+    "support": {
+        "issues": "http://github.com/i-lateral/silverstripe-trumbowyg-htmleditor/issues"
+    },
+    "require": {
+        "silverstripe/framework": ">=3.1"
+    }
+    "extra": {
+        "installer-name": "trumbowyg-htmleditor"
+    }
+}
