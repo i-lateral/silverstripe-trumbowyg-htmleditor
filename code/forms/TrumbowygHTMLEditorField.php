@@ -12,13 +12,14 @@
  *
  * @package Trumbowyg HTMLEditorField
  */
-class TrumbowygHTMLEditorField extends TextareaField {
+class TrumbowygHTMLEditorField extends TextareaField
+{
 
-	/**
-	 * @config
-	 * @var bool Should we check the valid_elements (& extended_valid_elements) rules from HtmlEditorConfig server side?
-	 */
-	private static $sanitise_server_side = false;
+    /**
+     * @config
+     * @var bool Should we check the valid_elements (& extended_valid_elements) rules from HtmlEditorConfig server side?
+     */
+    private static $sanitise_server_side = false;
     
     /**
      * Default buttons we will use
@@ -32,7 +33,7 @@ class TrumbowygHTMLEditorField extends TextareaField {
         'btnGrp-lists'
     );
 
-	protected $rows = 30;
+    protected $rows = 30;
     
     protected $buttons = array();
     
@@ -41,11 +42,13 @@ class TrumbowygHTMLEditorField extends TextareaField {
      * 
      * @return array
      */
-    public function getButtons() {
-        if($this->buttons && is_array($this->buttons))
+    public function getButtons()
+    {
+        if ($this->buttons && is_array($this->buttons)) {
             return $this->buttons;
-        else
+        } else {
             return $this->config()->default_buttons;
+        }
     }
     
     /**
@@ -54,7 +57,8 @@ class TrumbowygHTMLEditorField extends TextareaField {
      * @param 
      * @return Object
      */
-    public function setButtons($buttons) {
+    public function setButtons($buttons)
+    {
         $this->buttons = $buttons;
         return $this;
     }
@@ -65,11 +69,14 @@ class TrumbowygHTMLEditorField extends TextareaField {
      * @param 
      * @return Object
      */
-    public function addButton($button) {
+    public function addButton($button)
+    {
         $buttons = $this->buttons;
         
         // If buttons isn't an array, set it
-        if(!is_array($buttons)) $buttons = array();
+        if (!is_array($buttons)) {
+            $buttons = array();
+        }
             
         $buttons[] = $button;
         
@@ -83,36 +90,41 @@ class TrumbowygHTMLEditorField extends TextareaField {
      * 
      * @return array
      */
-    public function getButtonsJS() {
+    public function getButtonsJS()
+    {
         $buttons = $this->getButtons();
         $str = "";
         
-        for($x = 0; $x < count($buttons); $x++) {
+        for ($x = 0; $x < count($buttons); $x++) {
             $str .= "'" . $buttons[$x] . "'";
             
-            if($x < (count($buttons) - 1)) $str .= ",";
+            if ($x < (count($buttons) - 1)) {
+                $str .= ",";
+            }
         }
         
         return $str;
     }
-	
-	/**
-	 * @see TextareaField::__construct()
-	 */
-	public function __construct($name, $title = null, $value = '') {
-		parent::__construct($name, $title, $value);
-		
+    
+    /**
+     * @see TextareaField::__construct()
+     */
+    public function __construct($name, $title = null, $value = '')
+    {
+        parent::__construct($name, $title, $value);
+        
         // Add CSS and JS requirements
-		Requirements::css("trumbowyg-htmleditor/thirdparty/trumbowyg/ui/trumbowyg.min.css");
-		Requirements::css("trumbowyg-htmleditor/css/TrumbowygHtmlEditorField.css");
+        Requirements::css("trumbowyg-htmleditor/thirdparty/trumbowyg/ui/trumbowyg.min.css");
+        Requirements::css("trumbowyg-htmleditor/css/TrumbowygHtmlEditorField.css");
         Requirements::javascript("framework/thirdparty/jquery/jquery.js");
         Requirements::javascript("trumbowyg-htmleditor/thirdparty/trumbowyg/trumbowyg.min.js");
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function Field($properties = array()) {
+    }
+    
+    /**
+     * @return string
+     */
+    public function Field($properties = array())
+    {
 
         // Before rendering our field, require our custom script
         Requirements::javascriptTemplate(
@@ -123,44 +135,47 @@ class TrumbowygHTMLEditorField extends TextareaField {
             )
         );
 
-		return parent::Field($properties);
-	}
-	
-	public function saveInto(DataObjectInterface $record) {
-		if($record->hasField($this->name) && $record->escapeTypeForField($this->name) != 'xml') {
-			throw new Exception (
-				'HtmlEditorField->saveInto(): This field should save into a HTMLText or HTMLVarchar field.'
-			);
-		}
-		
-		$htmlValue = Injector::inst()->create('HTMLValue', $this->value);
+        return parent::Field($properties);
+    }
+    
+    public function saveInto(DataObjectInterface $record)
+    {
+        if ($record->hasField($this->name) && $record->escapeTypeForField($this->name) != 'xml') {
+            throw new Exception(
+                'HtmlEditorField->saveInto(): This field should save into a HTMLText or HTMLVarchar field.'
+            );
+        }
+        
+        $htmlValue = Injector::inst()->create('HTMLValue', $this->value);
 
-		// Sanitise if requested
-		if($this->config()->sanitise_server_side) {
-			$santiser = Injector::inst()->create('HtmlEditorSanitiser', HtmlEditorConfig::get_active());
-			$santiser->sanitise($htmlValue);
-		}
+        // Sanitise if requested
+        if ($this->config()->sanitise_server_side) {
+            $santiser = Injector::inst()->create('HtmlEditorSanitiser', HtmlEditorConfig::get_active());
+            $santiser->sanitise($htmlValue);
+        }
 
-		// optionally manipulate the HTML after a TinyMCE edit and prior to a save
-		$this->extend('processHTML', $htmlValue);
+        // optionally manipulate the HTML after a TinyMCE edit and prior to a save
+        $this->extend('processHTML', $htmlValue);
 
-		// Store into record
-		$record->{$this->name} = $htmlValue->getContent();
-	}
+        // Store into record
+        $record->{$this->name} = $htmlValue->getContent();
+    }
 
-	/**
-	 * @return HtmlEditorField_Readonly
-	 */
-	public function performReadonlyTransformation() {
-		$field = $this->castedCopy('TrumbowygHTMLEditorField_Readonly');
-		$field->dontEscape = true;
-		
-		return $field;
-	}
-	
-	public function performDisabledTransformation() {
-		return $this->performReadonlyTransformation();
-	}
+    /**
+     * @return HtmlEditorField_Readonly
+     */
+    public function performReadonlyTransformation()
+    {
+        $field = $this->castedCopy('TrumbowygHTMLEditorField_Readonly');
+        $field->dontEscape = true;
+        
+        return $field;
+    }
+    
+    public function performDisabledTransformation()
+    {
+        return $this->performReadonlyTransformation();
+    }
 }
 
 /**
@@ -168,14 +183,17 @@ class TrumbowygHTMLEditorField extends TextareaField {
  * @package forms
  * @subpackage fields-formattedinput
  */
-class TrumbowygHTMLEditorField_Readonly extends ReadonlyField {
-	public function Field($properties = array()) {
-		$valforInput = $this->value ? Convert::raw2att($this->value) : "";
-		return "<span class=\"readonly typography\" id=\"" . $this->id() . "\">"
-			. ( $this->value && $this->value != '<p></p>' ? $this->value : '<i>(not set)</i>' )
-			. "</span><input type=\"hidden\" name=\"".$this->name."\" value=\"".$valforInput."\" />";
-	}
-	public function Type() {
-		return 'htmleditorfield readonly';
-	}
+class TrumbowygHTMLEditorField_Readonly extends ReadonlyField
+{
+    public function Field($properties = array())
+    {
+        $valforInput = $this->value ? Convert::raw2att($this->value) : "";
+        return "<span class=\"readonly typography\" id=\"" . $this->id() . "\">"
+            . ($this->value && $this->value != '<p></p>' ? $this->value : '<i>(not set)</i>')
+            . "</span><input type=\"hidden\" name=\"".$this->name."\" value=\"".$valforInput."\" />";
+    }
+    public function Type()
+    {
+        return 'htmleditorfield readonly';
+    }
 }
