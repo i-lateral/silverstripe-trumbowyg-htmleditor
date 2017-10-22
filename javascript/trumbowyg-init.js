@@ -1,12 +1,11 @@
-jQuery.noConflict();
-
-(function($) {    
-    $(document).ready(function() {
-        var buttons = [$Buttons]; 
-     
-		$("#$ID").trumbowyg({
-            btns: buttons
+(function ($) {
+    $.entwine(function ($) {
+        $('.cms-edit-form textarea.trumbowyghtmleditor').entwine({
+            onmatch: function () {
+                $(this).trumbowyg({
+                    btns: ['btnGrp-design']
+                });
+            }
         });
-    });
-}(jQuery));
-
+    });
+})(jQuery);
