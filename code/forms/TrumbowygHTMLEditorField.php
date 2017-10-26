@@ -2,11 +2,11 @@
 /**
  * A simple WYSIWYG HTML editor field that can be used to add basic HTML
  * editing capabilities to a Silverstripe site.
- * 
+ *
  * At the moment this is designed to only be used in a front end form,
  * it would be nice to add support for the CMS however, and this will be
  * a future development.
- * 
+ *
  * Some of this code has been taken from the Silverstripe HTMLEditor
  * field
  *
@@ -20,10 +20,10 @@ class TrumbowygHTMLEditorField extends TextareaField
      * @var bool Should we check the valid_elements (& extended_valid_elements) rules from HtmlEditorConfig server side?
      */
     private static $sanitise_server_side = false;
-    
+
     /**
      * Default buttons we will use
-     * 
+     *
      * @var array
      * @config
      */
@@ -34,12 +34,12 @@ class TrumbowygHTMLEditorField extends TextareaField
     );
 
     protected $rows = 30;
-    
+
     protected $buttons = array();
-    
+
     /**
      * Get all the current buttons
-     * 
+     *
      * @return array
      */
     public function getButtons()
@@ -50,11 +50,11 @@ class TrumbowygHTMLEditorField extends TextareaField
             return $this->config()->default_buttons;
         }
     }
-    
+
     /**
      * Set our array of buttons
-     * 
-     * @param 
+     *
+     * @param
      * @return Object
      */
     public function setButtons($buttons)
@@ -62,64 +62,64 @@ class TrumbowygHTMLEditorField extends TextareaField
         $this->buttons = $buttons;
         return $this;
     }
-    
+
     /**
      * Set our array of buttons
-     * 
-     * @param 
+     *
+     * @param
      * @return Object
      */
     public function addButton($button)
     {
         $buttons = $this->buttons;
-        
+
         // If buttons isn't an array, set it
         if (!is_array($buttons)) {
             $buttons = array();
         }
-            
+
         $buttons[] = $button;
-        
+
         $this->buttons = $buttons;
-        
+
         return $this;
     }
-    
+
     /**
      * Get all the current buttons rendered as a string for JS
-     * 
+     *
      * @return array
      */
     public function getButtonsJS()
     {
         $buttons = $this->getButtons();
         $str = "";
-        
+
         for ($x = 0; $x < count($buttons); $x++) {
             $str .= "'" . $buttons[$x] . "'";
-            
+
             if ($x < (count($buttons) - 1)) {
                 $str .= ",";
             }
         }
-        
+
         return $str;
     }
-    
+
     /**
      * @see TextareaField::__construct()
      */
     public function __construct($name, $title = null, $value = '')
     {
         parent::__construct($name, $title, $value);
-        
+
         // Add CSS and JS requirements
         Requirements::css("trumbowyg-htmleditor/thirdparty/trumbowyg/ui/trumbowyg.min.css");
         Requirements::css("trumbowyg-htmleditor/css/TrumbowygHtmlEditorField.css");
         Requirements::javascript("framework/thirdparty/jquery/jquery.js");
         Requirements::javascript("trumbowyg-htmleditor/thirdparty/trumbowyg/trumbowyg.min.js");
     }
-    
+
     /**
      * @return string
      */
@@ -137,7 +137,7 @@ class TrumbowygHTMLEditorField extends TextareaField
 
         return parent::Field($properties);
     }
-    
+
     public function saveInto(DataObjectInterface $record)
     {
         if ($record->hasField($this->name) && $record->escapeTypeForField($this->name) != 'xml') {
@@ -145,7 +145,7 @@ class TrumbowygHTMLEditorField extends TextareaField
                 'HtmlEditorField->saveInto(): This field should save into a HTMLText or HTMLVarchar field.'
             );
         }
-        
+
         $htmlValue = Injector::inst()->create('HTMLValue', $this->value);
 
         // Sanitise if requested
@@ -168,10 +168,10 @@ class TrumbowygHTMLEditorField extends TextareaField
     {
         $field = $this->castedCopy('TrumbowygHTMLEditorField_Readonly');
         $field->dontEscape = true;
-        
+
         return $field;
     }
-    
+
     public function performDisabledTransformation()
     {
         return $this->performReadonlyTransformation();
